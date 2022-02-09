@@ -4,6 +4,7 @@ from utils.database import database
 from utils.schemas import RegisterOut ,UserLogin
 from utils import models
 from utils.account_check import account_check
+from utils.crud import Crud
 router = APIRouter(tags=['get_user'])
 
 #Get user by ID(provided in the path)
@@ -18,8 +19,8 @@ async def user_get(id:int, user:UserLogin):
 
     # check the user by id from the path
     try:
-        query = models.users.select().where(models.users.c.id==id)
-        result = await database.fetch_one(query)
+        #query = Crud.get(id)
+        result = await Crud.read(id)
         #print(result)
         if result:
             return result

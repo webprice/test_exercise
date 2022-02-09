@@ -4,6 +4,7 @@ from utils.database import database
 from utils.schemas import RegisterOut,RegisterIn
 from utils import models,pwd
 from utils.pass_user import pass_user
+from utils.crud import Crud
 router = APIRouter(tags=['registration'])
 
 #user registration route
@@ -18,9 +19,9 @@ async def user_post(user: RegisterIn):
 
         # hash the password user.pasword
         hashed_password = await pwd.hash(user.password)
-        query = models.users.insert().values(username=user.username, email=user.email,password=hashed_password)
-        result = await database.execute(query)
-
+        # query = models.users.insert().values(username=user.username, email=user.email,password=hashed_password)
+        # result = await database.execute(query)
+        await Crud.create(id,user,hashed_password)
     #this exception will work only if someone registered with email/username that is already taken in the DB
     #The ID of the user will have gaps between numbers(previous users) if spam same data over and over again
     #The official explanation next:
@@ -36,7 +37,9 @@ async def user_post(user: RegisterIn):
         raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="The data is too big")
 
     #check the newly created user and return it's data
-    check_query = models.users.select().where(models.users.c.email==user.email)
+    #check_query = models.users.select().where(models.users.c.email==user.email)
     #timestamp can be overwritten in pretty manner:
     #user.register_date = str(query["register_date"].date())
-    return await database.fetch_one(check_query)
+    #eturn await database.fetch_one(check_query)
+    #print(Crud.read_by_email(user.email))
+    return await Crud.read_by_email(user.email)

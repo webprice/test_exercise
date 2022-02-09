@@ -4,6 +4,7 @@ from utils.database import database
 from utils.schemas import UserLogin,AccountRemoved
 from utils import models
 from utils.account_check import account_check
+from utils.crud import Crud
 router = APIRouter(tags=['delete'])
 
 # required the active account to perform delete actions
@@ -17,15 +18,16 @@ async def user_get(id:int, user:UserLogin):
     await account_check(user.username, user.password)
     try:
         #check if account we want to delete exist:
-        query = models.users.select().where(models.users.c.id==id)
-        result = await database.fetch_one(query)
+        #query = models.users.select().where(models.users.c.id==id)
+        result = await Crud.read(id)
         #print(result)
 
         #if account that we want to delete exists in the db, deleting it:
         if result:
-            remove_query= models.users.delete().where(models.users.c.id==id)
+            #remove_query= models.users.delete().where(models.users.c.id==id)
             #print(remove_query)
-            await database.execute(remove_query)
+            #await database.execute(remove_query)
+            await Crud.delete(id)
             return result
         else:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Account doesn't exist")

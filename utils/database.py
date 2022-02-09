@@ -7,6 +7,6 @@ DATABASE_URL = f"postgresql://" \
                f"{settings.database_hostname}:{settings.database_port}/{settings.database_name}"
 database = databases.Database(DATABASE_URL)
 metadata = sqlalchemy.MetaData()
-#engine = sqlalchemy.create_engine(DATABASE_URL)
+engine = sqlalchemy.create_engine(DATABASE_URL)
 
 

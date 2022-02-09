@@ -4,7 +4,7 @@ from utils.database import database
 from utils.schemas import PatchIn, PatchOut
 from utils import models,pwd
 from utils.pass_user import pass_user
-
+from utils.crud import Crud
 router = APIRouter(tags=['patch_user'])
 
 #Patch will return the data and 200 response code, even if we send same data that already exist under #id row
@@ -19,8 +19,9 @@ router = APIRouter(tags=['patch_user'])
 async def update_item(id: int, item: PatchIn):
 
     #check if account exist in the DB:
-    account_query = models.users.select().where(id == models.users.c.id)
-    account_check_result = await database.fetch_one(account_query)
+    #account_query = models.users.select().where(id == models.users.c.id)
+    #account_check_result = await database.fetch_one(account_query)
+    account_check_result = await Crud.read(id)
     if not account_check_result:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Account doesn't exist")
 
@@ -45,8 +46,9 @@ async def update_item(id: int, item: PatchIn):
     update_data = goodmodel.dict(exclude_none=True, exclude_unset=True)
     updated_item = stored_item_model.copy(update=update_data)
     try:
-        patch_query  = models.users.update().where(models.users.c.id == id).values(update_data)
-        await database.execute(patch_query)
+        # patch_query  = models.users.update().where(models.users.c.id == id).values(update_data)
+        # await database.execute(patch_query)
+        await Crud.patch(id,update_data)
     except asyncpg.exceptions.PostgresSyntaxError:
         raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="Please provide any of these: "
                                                                                "email,password,username "
